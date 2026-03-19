@@ -1,0 +1,13 @@
+.app {
+  background-color: var(--background);
+}
+
+.main {
+  width: 100%;
+  align-self: center;
+  overflow: hidden;
+}
+
+.app-page {
+  height: 100vh;
+}

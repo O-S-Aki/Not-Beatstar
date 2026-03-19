@@ -1,0 +1,11 @@
+.lane {
+  flex: 1;
+  position: relative;
+  background-color: var(--lane-color);
+}
+
+.lane.threshold {
+  border-radius: 0.75rem;
+  background-color: var(--threshold-color);
+  box-shadow: 0 0 1rem rgba(0, 0, 0, 0.4) inset;
+}

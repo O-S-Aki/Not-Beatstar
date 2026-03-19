@@ -1,0 +1,19 @@
+.tile {
+  position: absolute;
+  background-color: black;
+  width: 100%;
+  height: var(--tile-height);
+  border-radius: 0.75rem;
+  z-index: 99;
+  border: 5px outset var(--background);
+  color: var(--background);
+
+  /* Only for testing - get rid of this */
+  bottom: 50%;
+}
+
+.h-line {
+  height: 5%;
+  background-color: var(--background);
+  border-radius: 30%;
+}

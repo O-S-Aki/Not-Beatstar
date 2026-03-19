@@ -1,0 +1,42 @@
+.board {
+  background-color: var(--board-color);
+  width: min(100%, 500px);
+  height: min(100%, 1000px);
+  position: relative;
+  transform: perspective(800px) rotateX(6deg);
+  transform-origin: bottom;
+  filter: blur(0.3px);
+}
+
+.lane-container,
+.perfect-threshold {
+  gap: 0.15rem;
+}
+
+.board::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60%;
+
+  background: linear-gradient(
+    to bottom,
+    rgba(248, 249, 252, 1) 0%,
+    rgba(248, 249, 252, 1) 5%,
+    rgba(248, 249, 252, 0) 100%
+  );
+
+  z-index: 100;
+
+  pointer-events: none;
+}
+
+.perfect-threshold  {
+  position: absolute;
+  height: var(--tile-height);
+  left: 0;
+  right: 0;
+  bottom: 18%;
+}

@@ -1,0 +1,17 @@
+.score-indicator {
+  background-color: var(--board-color);
+  color: var(--background);
+  height: var(--score-indicator-size);
+  width: var(--score-indicator-size);
+  border-radius: 50%;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+}
+
+.score-display {
+  font-weight: 700;
+}
+
+.stage-display {
+  font-size: smaller;
+  font-weight: 300;
+}

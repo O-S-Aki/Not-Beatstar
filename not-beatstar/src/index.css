@@ -1,0 +1,49 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+[data-theme="light"] {
+  --text: #030407;
+  --background: #f8f9fc;
+  --primary: #4b79c3;
+  --secondary: #9db7e1;
+  --accent: #648fd3;
+
+  --linearPrimarySecondary: linear-gradient(#4b79c3, #9db7e1);
+  --linearPrimaryAccent: linear-gradient(#4b79c3, #648fd3);
+  --linearSecondaryAccent: linear-gradient(#9db7e1, #648fd3);
+  --radialPrimarySecondary: radial-gradient(#4b79c3, #9db7e1);
+  --radialPrimaryAccent: radial-gradient(#4b79c3, #648fd3);
+  --radialSecondaryAccent: radial-gradient(#9db7e1, #648fd3);
+
+  --board-color: #363636;
+  --lane-color: #dadada;
+  --threshold-color: #c4c4c4;
+
+  --tile-height: 18%;
+  --score-indicator-size: 125px;
+}
+
+[data-theme="dark"] {
+  --text: #f8f9fc;
+  --background: #030407;
+  --primary: #3c6ab4;
+  --secondary: #1e3862;
+  --accent: #2c569b;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+  border: none;
+}
+
+body {
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+  background-color: var(--background-dark);
+  color: var(--text-dark);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
