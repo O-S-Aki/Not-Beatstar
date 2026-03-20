@@ -1,5 +1,7 @@
 import { useRef, useState } from 'react';
+
 import { useGameLoop } from '../../hooks/useGameLoop';
+import { useInput } from '../../hooks/useInput';
 
 import { Board, ScoreIndicator } from '../../components';
 import { Engine } from '../../lib/game/Engine';
@@ -35,6 +37,19 @@ const GamePage: React.FC<Props> = ({ song }) => {
 
     const time: number = engineRef.current.timing.getTime();
     setSongTime(time);
+  })
+
+  useInput((lane) => {
+    const engine: Engine | null = engineRef.current;
+
+    if (!engine) {
+      return;
+    }
+
+    const currentTime: number = engine.timing.getTime();
+    const result = engine.hit(lane, currentTime);
+
+    console.log(result);
   })
 
   return (
