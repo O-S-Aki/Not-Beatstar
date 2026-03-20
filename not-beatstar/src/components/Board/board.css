@@ -38,5 +38,5 @@
   height: var(--tile-height);
   left: 0;
   right: 0;
-  bottom: 18%;
+  bottom: var(--threshold-offset);
 }

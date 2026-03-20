@@ -47,7 +47,7 @@ const GamePage: React.FC<Props> = ({ song }) => {
         </div>
         
         <div className="board-container d-flex flex-column justify-content-end align-items-center">
-          <Board />
+          <Board notes={engineRef.current?.notes ?? []} songTime={songTime} />
         </div>
 
 

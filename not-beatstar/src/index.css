@@ -18,7 +18,9 @@
   --lane-color: #dadada;
   --threshold-color: #c4c4c4;
 
-  --tile-height: 18%;
+  --tile-height: 16%;
+  --threshold-offset: 18%;
+
   --score-indicator-size: 125px;
 }
 

@@ -2,6 +2,7 @@
   flex: 1;
   position: relative;
   background-color: var(--lane-color);
+  overflow: hidden;
 }
 
 .lane.threshold {
