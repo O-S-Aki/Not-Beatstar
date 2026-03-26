@@ -27,7 +27,7 @@ const Lane: React.FC<Props> = ({ threshold, position, notes, songTime }) => {
 
   const laneNotes = notes.filter(note => note.lane === position);
   const lanes: string[] = ['L', 'C', 'R'];
-
+  
   return (
     <>
       <div className={`lane h-100 ${threshold ? 'threshold' : 'standard'} lane-${lanes[position]}`}>

@@ -1,9 +1,10 @@
 export class Timing {
   private audio: HTMLAudioElement;
-  private startOffset: number = 0;
+  private startOffset: number;
 
   constructor(audio: HTMLAudioElement) {
     this.audio = audio;
+    this.startOffset = -700;
   }
 
   start() {
