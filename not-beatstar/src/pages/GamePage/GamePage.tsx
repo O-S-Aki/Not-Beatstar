@@ -6,7 +6,7 @@ import { useInput } from '../../hooks/useInput';
 import { Board, ScoreIndicator } from '../../components';
 import { Engine } from '../../lib/game/Engine';
 
-import type { Song } from '../../lib/interfaces';
+import type { Song, Note, HitResult } from '../../lib/interfaces';
 
 import './gamePage.css';
 
@@ -18,25 +18,28 @@ const GamePage: React.FC<Props> = ({ song }) => {
   const songRef = useRef<HTMLAudioElement>(null);
   const engineRef = useRef<Engine | null>(null);
 
-  const [songTime, setSongTime] = useState(0);
+  const [songTimeMs, setSongTimeMs] = useState(0);
 
   const startGame = () => {
-    const song: HTMLAudioElement = songRef.current!;
-    const engine: Engine = new Engine(song);
+    const audio: HTMLAudioElement = songRef.current!;
+    audio.currentTime = 0;
+    audio.play();
 
-    engine.start()
-    engineRef.current = engine;
+    const pattern: Note[] = song.pattern ?? [];
+    engineRef.current = new Engine(audio, pattern);
   }
 
   useGameLoop(() => {
-    if (!engineRef.current) {
-      return
+    const engine: Engine | null = engineRef.current;
+
+    if (!engine) {
+      return;
     }
 
-    engineRef.current.update()
+    engine.update();
+    engine.cleanMissedNotes();
 
-    const time: number = engineRef.current.timing.getTime();
-    setSongTime(time);
+    setSongTimeMs(engine.currentTimeMs);
   })
 
   useInput((lane) => {
@@ -46,10 +49,10 @@ const GamePage: React.FC<Props> = ({ song }) => {
       return;
     }
 
-    const currentTime: number = engine.timing.getTime();
-    const result = engine.hit(lane, currentTime);
+    const result: HitResult = engine.hit(lane);
 
-    console.log(result);
+    const msg = `LANE ${lane} | Δ${Math.round(result.deltaMs)}ms | ${['-', 'MISS', 'GOOD', 'PERFECT'][result.rating]}`;
+    console.log(msg);
   })
 
   return (
@@ -62,7 +65,7 @@ const GamePage: React.FC<Props> = ({ song }) => {
         </div>
         
         <div className="board-container d-flex flex-column justify-content-end align-items-center">
-          <Board notes={engineRef.current?.notes ?? []} songTime={songTime} />
+          <Board notes={engineRef.current?.notes ?? []} songTimeMs={songTimeMs} />
         </div>
 
 

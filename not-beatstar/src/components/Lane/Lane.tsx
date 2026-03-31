@@ -1,4 +1,5 @@
-import { useRef, type RefObject } from 'react';
+import { useRef, useLayoutEffect, useState } from 'react';
+import { TRAVEL_TIME_MS, THRESHOLD_OFFSET_PERCENT } from '../../lib/constants/GameConfig';
 
 import { getTilePosition } from '../../lib/util/getTilePosition';
 import { Tile } from '../';
@@ -11,33 +12,58 @@ interface Props {
   threshold: boolean
   position: number
   notes: Note[],
-  songTime: number,
+  songTimeMs: number,
 }
 
-const Lane: React.FC<Props> = ({ threshold, position, notes, songTime }) => {
-  const laneRef: RefObject<HTMLDivElement | null> = useRef<HTMLDivElement>(null);
-  const laneHeightPixels: number = laneRef.current?.clientHeight ?? 0;
+const Lane: React.FC<Props> = ({ threshold, position, notes, songTimeMs }) => {
+  const laneRef = useRef<HTMLDivElement>(null);
+  const [laneHeightPx, setLaneHeightPx] = useState(0);
 
-  const tileHeightPercent: number = 0.16;
-  const thresholdOffsetPercent: number = 0.18;
+  useLayoutEffect(() => {
+    const lane = laneRef.current;
 
-  const tileSpeed: number = 0.5;
-  const tileHeightPixels: number = laneHeightPixels * tileHeightPercent;
-  const thresholdLocationPixels: number = laneHeightPixels * (1 - thresholdOffsetPercent);
+    if (!lane) {
+      return;
+    }
+
+    const update = () => setLaneHeightPx(lane.clientHeight);
+    update();
+
+    const timeOut: number = setTimeout(update, 0);
+    window.addEventListener('resize', update);
+    
+    return () => {
+      window.removeEventListener('resize', update);
+      clearTimeout(timeOut);
+    }
+  }, [])
 
   const laneNotes = notes.filter(note => note.lane === position);
   const lanes: string[] = ['L', 'C', 'R'];
-  
+
+
   return (
     <>
-      <div className={`lane h-100 ${threshold ? 'threshold' : 'standard'} lane-${lanes[position]}`}>
+      <div ref={laneRef} className={`lane h-100 ${threshold ? 'threshold' : 'standard'} lane-${lanes[position]}`}>
         {
           threshold ? (<></>) : (
             laneNotes.map((note) => {
-              const tilePosition: number = getTilePosition(note.hitTime, songTime, thresholdLocationPixels, tileSpeed, tileHeightPixels);
+              const thresholdOffsetPx: number = laneHeightPx * THRESHOLD_OFFSET_PERCENT;
+
+              const tilePosition = getTilePosition(
+                note.songTimeMs,
+                songTimeMs,
+                laneHeightPx,
+                thresholdOffsetPx,
+                TRAVEL_TIME_MS
+              );
+
+              if (tilePosition < 0 || tilePosition > laneHeightPx) {
+                return null
+              }
 
               return (
-                <Tile key={note.hitTime} style={{ transform: `translateY(${tilePosition}px)` }} />
+                <Tile key={note.id} style={{ transform: `translateY(${tilePosition}px)` }} />
               )
             }))
         }

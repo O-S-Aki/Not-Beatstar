@@ -7,6 +7,8 @@
   --secondary: #9db7e1;
   --accent: #648fd3;
 
+  --primary-shadow: rgba(75, 121, 195, 0.5);
+
   --linearPrimarySecondary: linear-gradient(#4b79c3, #9db7e1);
   --linearPrimaryAccent: linear-gradient(#4b79c3, #648fd3);
   --linearSecondaryAccent: linear-gradient(#9db7e1, #648fd3);
@@ -19,9 +21,10 @@
   --threshold-color: #c4c4c4;
 
   --tile-height: 16%;
+  --half-tile-height: 8%;
   --threshold-offset: 18%;
 
-  --score-indicator-size: 125px;
+  --score-indicator-size: 150px;
 }
 
 [data-theme="dark"] {

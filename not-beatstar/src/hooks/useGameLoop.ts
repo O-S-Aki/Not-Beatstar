@@ -1,16 +1,21 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
-export function useGameLoop(updateGame: () => void) {
+export function useGameLoop(update: () => void) {
+  const callbackRef = useRef(update);
+  
+    useEffect(() => {
+      callbackRef.current = update;
+    });
+
   useEffect(() => {
     let frame: number;
 
     const loop = () => {
-      updateGame();
+      update();
       frame = requestAnimationFrame(loop);
     }
 
-    loop();
-
+    frame = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(frame);
-  }, [])
+  }, [update])
 }

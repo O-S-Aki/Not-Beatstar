@@ -1,68 +1,61 @@
-import { Timing } from "./Timing";
-import type { Note } from '../interfaces';
+import { HIT_WINDOW_MS, PERFECT_WINDOW_MS, AUDIO_LATENCY_MS } from '../constants/GameConfig';
+
+import type { HitResult, Note } from '../interfaces'
 
 export class Engine {
-  timing: Timing
+  private audio: HTMLAudioElement;
+  public notes: Note[] = [];
+  public currentTimeMs: number = 0;
 
-  hitWindow: number = 150;
-  perfectWindow: number = 75;
-
-  notes: Note[] = [
-    { lane: 0, hitTime: 3500 },
-    { lane: 2, hitTime: 3750 },
-    { lane: 1, hitTime: 4000 },
-    { lane: 2, hitTime: 4250 },
-    { lane: 1, hitTime: 4400 },
-    { lane: 0, hitTime: 4900 },
-    { lane: 2, hitTime: 5200 },
-    { lane: 1, hitTime: 5500 },
-    { lane: 2, hitTime: 5800 },
-    { lane: 1, hitTime: 6100 },
-    { lane: 0, hitTime: 6400 },
-    { lane: 1, hitTime: 6700 },
-    { lane: 2, hitTime: 7000 },
-    { lane: 1, hitTime: 7300 },
-    { lane: 2, hitTime: 7600 },
-    { lane: 1, hitTime: 7900 },
-    { lane: 0, hitTime: 8200 }
-  ];
-
-  constructor(song: HTMLAudioElement) {
-    this.timing = new Timing(song);
-  }
-
-  start() {
-    this.timing.start();
+  constructor(audio: HTMLAudioElement, pattern: Note[]) {
+    this.audio = audio;
+    this.notes = [...pattern];
   }
 
   update() {
-    this.timing.getTime();
+    this.currentTimeMs = this.audio.currentTime * 1000;
   }
 
-  hit(lane: number, currentTime: number) {
-    const index = this.notes.findIndex(n => n.lane === lane);
-
-    if (index === -1) {
-      return `LANE ${lane}: couldn't find target note`
+  hit(lane: number): HitResult {
+    const potentialNotes: Note[] = this.notes.filter(note => note.lane === lane);
+    
+    if (potentialNotes.length === 0) {
+      return { lane, deltaMs: 0, rating: 0 };
     }
 
-    const targetNote = this.notes[index];
-    const delta = Math.abs(targetNote.hitTime - currentTime);
+    const nearestNote: Note = potentialNotes.reduce((best, note) =>
+      Math.abs(note.songTimeMs - this.currentTimeMs) < Math.abs(best.songTimeMs - this.currentTimeMs) ? note : best
+    );
+    
+    const deltaMs = Math.abs(nearestNote.songTimeMs - this.getAdjustedTime());
 
-    this.notes.splice(index, 1);
+    // const human = nearestNote.songTimeMs.toFixed(0);
+    // console.log(`Lane ${lane} | noteTime ${human} | audio ${this.currentTimeMs.toFixed(0)} | Δ${Math.round(deltaMs)}`);
 
-    if (delta < this.hitWindow) {
-      if (delta < this.perfectWindow) {
-        return this.log(lane, targetNote.hitTime, currentTime, "perfect")
-      }
-
-      return this.log(lane, targetNote.hitTime, currentTime, "good")
+    if (deltaMs <= PERFECT_WINDOW_MS) {
+      this.remove(nearestNote.id);
+      return { lane, deltaMs, rating: 3 };
     }
 
-    return this.log(lane, targetNote.hitTime, currentTime, "miss")
+    else if (deltaMs <= HIT_WINDOW_MS) {
+      this.remove(nearestNote.id);
+      return { lane, deltaMs, rating: 2 };
+    }
+
+    else {
+      return { lane, deltaMs, rating: 1 };
+    }
   }
-  
-  log(lane: number, hitTime: number, currentTime: number, result: string): string {
-    return (`| LANE ${lane} | HIT TIME: ${hitTime}ms | CURRENT TIME: ${currentTime}ms | RESULT: ${result}`)
+
+  private getAdjustedTime() {
+    return this.currentTimeMs + AUDIO_LATENCY_MS;
+  }
+
+  private remove(id: number) {
+    this.notes = this.notes.filter(note => note.id !== id);
+  }
+
+  cleanMissedNotes() {
+    this.notes = this.notes.filter(note => note.songTimeMs > this.currentTimeMs - HIT_WINDOW_MS);
   }
 }

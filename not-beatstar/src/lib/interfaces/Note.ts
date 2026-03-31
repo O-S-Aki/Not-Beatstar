@@ -1,4 +1,5 @@
 export default interface Note {
+  id: number;
   lane: number;
-  hitTime: number;
+  songTimeMs: number;
 }

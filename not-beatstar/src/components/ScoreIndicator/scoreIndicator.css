@@ -4,7 +4,8 @@
   height: var(--score-indicator-size);
   width: var(--score-indicator-size);
   border-radius: 50%;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.6);
+  border: 6px solid white;
 }
 
 .score-display {
@@ -13,5 +14,5 @@
 
 .stage-display {
   font-size: smaller;
-  font-weight: 300;
+  font-weight: 400;
 }

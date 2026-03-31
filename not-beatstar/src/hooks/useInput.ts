@@ -1,29 +1,30 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
-export function useInput(onLanePress: (lane: number) => void) {
+export function useInput(onKeyPress: (lane: number) => void) {
+  const callbackRef = useRef(onKeyPress);
+
+  useEffect(() => {
+    callbackRef.current = onKeyPress;
+  });
+
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
-      if (event.repeat) {
-        return;
-      }
+      const key: string = event.key.toUpperCase();
+      const laneMap: Record<string, number>  = {
+        "A": 0,
+        "S": 1,
+        "D": 2
+      };
 
-      if (event.key === "a") {
-        onLanePress(0);
+      if (key in laneMap) {
+        onKeyPress(laneMap[key]);
       }
-
-      if (event.key == "s") {
-        onLanePress(1);
-      }
-
-      if (event.key == "d") {
-        onLanePress(2);
-      }
-    };
+    }
 
     window.addEventListener("keydown", handleKeyPress);
 
     return () => {
       window.removeEventListener("keydown", handleKeyPress)
     }
-  }, [onLanePress])
+  }, [onKeyPress])
 }
