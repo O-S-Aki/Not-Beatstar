@@ -1,23 +1,24 @@
 import { useRef, useLayoutEffect, useState } from 'react';
 import { TRAVEL_TIME_MS, THRESHOLD_OFFSET_PERCENT } from '../../lib/constants/GameConfig';
 
-import { getTilePosition } from '../../lib/util/getTilePosition';
-import { Tile } from '../';
+import { getTilePosition } from '../../lib/game';
+import { getHitDescriptionFromRating } from '../../lib/util/getHitDescriptionFromRating';
 
+import { Tile } from '../';
 import type { Note, HitFeedback } from '../../lib/interfaces';
 
 import './lane.css'
-import { getHitDescriptionFromRating } from '../../lib/util/getHitDescriptionFromRating';
 
 interface Props {
   threshold: boolean
   position: number
   notes: Note[],
   songTimeMs: number,
-  hitFeedback: HitFeedback
+  hitFeedback: HitFeedback,
+  onLaneTouch: (lane: number) => void
 }
 
-const Lane: React.FC<Props> = ({ threshold, position, notes, songTimeMs, hitFeedback }) => {
+const Lane: React.FC<Props> = ({ threshold, position, notes, songTimeMs, hitFeedback, onLaneTouch }) => {
   const laneRef = useRef<HTMLDivElement>(null);
   const [laneHeightPx, setLaneHeightPx] = useState(0);
 
@@ -49,6 +50,7 @@ const Lane: React.FC<Props> = ({ threshold, position, notes, songTimeMs, hitFeed
   return (
     <>
       <div ref={laneRef} className={`lane h-100 ${threshold ? 'threshold' : `standard lane-${lanes[position]}`}`}>
+        <div className="lane-click-overlay" onTouchStart={() => {onLaneTouch(position)}}></div>
         {
           threshold ? (
             <>

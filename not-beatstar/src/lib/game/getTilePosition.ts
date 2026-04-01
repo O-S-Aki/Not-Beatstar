@@ -1,10 +1,10 @@
-export const getTilePosition = (
+export default function getTilePosition (
   noteTimeMs: number,
   songTimeMs: number,
   laneHeightPx: number,
   thresholdOffsetPx: number,
   travelTimeMs: number
-) => {
+): number {
   /**
    * noteTimeMs           - the time relative to the audio in ms where the note should hit the threshold
    * songTimeMs           - the current time of the audio in ms

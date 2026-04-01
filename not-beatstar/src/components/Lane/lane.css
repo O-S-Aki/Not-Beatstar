@@ -5,6 +5,13 @@
   overflow: hidden;
 }
 
+.lane-click-overlay {
+  position: absolute;
+  background-color: transparent;
+  inset: 0;
+  z-index: 200;
+}
+
 .lane.threshold {
   border-radius: 0.75rem;
   background-color: transparent;

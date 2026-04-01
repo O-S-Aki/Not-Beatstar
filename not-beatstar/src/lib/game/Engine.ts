@@ -2,7 +2,7 @@ import { HIT_WINDOW_MS, PERFECT_WINDOW_MS, AUDIO_LATENCY_MS } from '../constants
 
 import type { HitResult, Note } from '../interfaces'
 
-export class Engine {
+export default class Engine {
   private audio: HTMLAudioElement;
   public notes: Note[] = [];
   public currentTimeMs: number = 0;

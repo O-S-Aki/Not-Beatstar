@@ -3,9 +3,9 @@ import { useRef, useState } from 'react';
 import { useGameLoop, useInput, useHitFeedback } from '../../hooks/';
 
 import { Board, ScoreIndicator } from '../../components';
-import { Engine } from '../../lib/game/Engine';
+import { Engine, handleGameLoop, handleInput } from '../../lib/game';
 
-import type { Song, Note, HitResult, HitFeedback, FeedbackState } from '../../lib/interfaces';
+import type { Song, Note, FeedbackState } from '../../lib/interfaces';
 
 import './gamePage.css';
 
@@ -21,27 +21,16 @@ const GamePage: React.FC<Props> = ({ song }) => {
   const feedbackState: FeedbackState = useHitFeedback();
 
   useGameLoop(() => {
-    const engine: Engine | null = engineRef.current;
-    if (!engine) return;
-
-    engine.update();
-    engine.cleanMissedNotes();
-
-    setSongTimeMs(engine.currentTimeMs);
+    handleGameLoop(engineRef, setSongTimeMs);
   })
 
   useInput((lane) => {
-    const engine: Engine | null = engineRef.current;
-    if (!engine) return;
-
-    const result: HitResult = engine.hit(lane);
-    const feedback: HitFeedback = { key: feedbackState.feedbackArray[lane].key + 1, lane, rating: result.rating, tileId: result.tileId };
-
-    feedbackState.setFeedback(lane, feedback);
-
-    const msg = `LANE ${lane} | Δ${Math.round(result.deltaMs)}ms | ${['MISS', 'MISS', 'GOOD', 'PERFECT'][result.rating]}`;
-    console.log(msg);
+    handleInput(engineRef, feedbackState, lane, true);
   })
+
+  const onLaneTouch = (lane: number) => {
+    handleInput(engineRef, feedbackState, lane, true);
+  }
 
   const startGame = () => {
     const audio: HTMLAudioElement = songRef.current!;
@@ -63,7 +52,7 @@ const GamePage: React.FC<Props> = ({ song }) => {
           </div>
           
           <div className="board-container d-flex flex-column justify-content-end align-items-center">
-            <Board notes={engineRef.current?.notes ?? []} songTimeMs={songTimeMs} feedbackArray={feedbackState.feedbackArray} />
+            <Board notes={engineRef.current?.notes ?? []} songTimeMs={songTimeMs} feedbackArray={feedbackState.feedbackArray} onLaneTouch={onLaneTouch} />
           </div>
         </div>
       </div>
