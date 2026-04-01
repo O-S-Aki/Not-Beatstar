@@ -1,5 +1,6 @@
 export type { default as Song } from './Song';
 export type { default as Note } from './Note';
+export type { default as Section } from './Section';
 
 export type { default as HitResult } from './HitResult';
 export type { default as HitFeedback } from './HitFeedback';
