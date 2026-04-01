@@ -1,10 +1,10 @@
-import type { Note } from "./";
+import type { Note, Section } from "./";
 
 export default interface Song {
   id: string;
   title: string;
   artist: string;
-  bpm: number;
   uri: string;
-  pattern?: Note[];
+  pattern: Note[];
+  sections: Section[];
 }
