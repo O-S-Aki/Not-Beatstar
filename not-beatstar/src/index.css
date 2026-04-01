@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
-[data-theme="light"] {
+:root {
   --text: #030407;
   --background: #f8f9fc;
   --primary: #4b79c3;
@@ -29,14 +29,6 @@
   --threshold-offset: 18%;
 
   --score-indicator-size: 150px;
-}
-
-[data-theme="dark"] {
-  --text: #f8f9fc;
-  --background: #030407;
-  --primary: #3c6ab4;
-  --secondary: #1e3862;
-  --accent: #2c569b;
 }
 
 html {
