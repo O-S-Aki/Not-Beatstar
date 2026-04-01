@@ -49,6 +49,11 @@ export default class Engine {
     }
   }
 
+  recordTimeStamp(): void {
+    const hitTimeMs: number = this.getAdjustedTime();
+    console.log(`${hitTimeMs.toFixed(0)}ms`);
+  }
+
   private getHitResult(lane: number, hitTimeMs: number, deltaMs: number, rating: 0 | 1 | 2 | 3, tileId?: number): HitResult {
     const hitResult: HitResult = {
       lane,

@@ -35,12 +35,11 @@ html {
   position: relative;
   min-height: 100%;
   border: none;
+  background-color: black;
 }
 
 body {
-  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
-  background-color: var(--background-dark);
-  color: var(--text-dark);
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;;
 }
 
 *,

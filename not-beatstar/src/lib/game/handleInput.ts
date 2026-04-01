@@ -19,5 +19,7 @@ export default function handleInput (
 
   if (logOutcome) {
     console.log(`LANE ${lane} | Δ${Math.round(result.deltaMs)}ms | ${['MISS', 'MISS', 'GOOD', 'PERFECT'][result.rating]}`);
+
+    // engine.recordTimeStamp();
   }
 }

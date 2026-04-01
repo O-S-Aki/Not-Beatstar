@@ -7,6 +7,6 @@
 .game-container {
   width: 100%;
   height: 100%;
-  max-width: 800px;
+  max-width: 400px;
   background-color: var(--primary);
 }
