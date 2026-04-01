@@ -16,9 +16,13 @@
   --radialPrimaryAccent: radial-gradient(#4b79c3, #648fd3);
   --radialSecondaryAccent: radial-gradient(#9db7e1, #648fd3);
 
-  --board-color: #363636;
+  --board-color: #131313;
   --lane-color: #dadada;
   --threshold-color: #c4c4c4;
+
+  --miss-color: #ff0000;
+  --good-color: #ffcc00;
+  --perfect-color: #00ff00;
 
   --tile-height: 16%;
   --half-tile-height: 8%;

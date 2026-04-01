@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-export function useInput(onKeyPress: (lane: number) => void) {
+export default function useInput(onKeyPress: (lane: number) => void) {
   const callbackRef = useRef(onKeyPress);
 
   useEffect(() => {

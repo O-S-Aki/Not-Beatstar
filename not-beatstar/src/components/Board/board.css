@@ -6,6 +6,7 @@
   transform: perspective(800px) rotateX(6deg);
   transform-origin: bottom;
   filter: blur(0.3px);
+  overflow: hidden;
 }
 
 .lane-container,

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-export function useGameLoop(update: () => void) {
+export default function useGameLoop(update: () => void) {
   const callbackRef = useRef(update);
   
     useEffect(() => {

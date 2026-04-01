@@ -1,3 +1,7 @@
 export type { default as Song } from './Song';
 export type { default as Note } from './Note';
+
 export type { default as HitResult } from './HitResult';
+export type { default as HitFeedback } from './HitFeedback';
+
+export type { default as FeedbackState } from './FeedbackState';
