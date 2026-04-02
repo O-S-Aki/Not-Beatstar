@@ -3,5 +3,6 @@ export default interface HitResult {
   hitTimeMs: number;
   deltaMs: number;
   rating: 0 | 1 | 2 | 3;
-  tileId?: number;
+  sectionId?: number;
+  noteId?: number;
 }

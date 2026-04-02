@@ -4,12 +4,12 @@ import type { HitResult, Note } from '../interfaces'
 
 export default class Engine {
   private audio: HTMLAudioElement;
-  public notes: Note[] = [];
+  public beatMap: Note[] = [];
   public currentTimeMs: number = 0;
 
-  constructor(audio: HTMLAudioElement, pattern: Note[]) {
+  constructor(audio: HTMLAudioElement, beatMap: Note[]) {
     this.audio = audio;
-    this.notes = [...pattern];
+    this.beatMap = [...beatMap];
   }
 
   update() {
@@ -17,7 +17,7 @@ export default class Engine {
   }
 
   hit(lane: number): HitResult {
-    const potentialNotes: Note[] = this.notes.filter(note => note.lane === lane);
+    const potentialNotes: Note[] = this.beatMap.filter(note => note.lane === lane);
     
     if (potentialNotes.length === 0) {
       return this.getHitResult(lane, 0, 0, 0);
@@ -34,18 +34,18 @@ export default class Engine {
     // console.log(`Lane ${lane} | noteTime ${human} | audio ${this.currentTimeMs.toFixed(0)} | Δ${Math.round(deltaMs)}ms`);
 
     if (deltaMs <= PERFECT_WINDOW_MS) {
-      this.remove(nearestNote.id);
-      return this.getHitResult(lane, hitTimeMs, deltaMs, 3, nearestNote.id);
+      this.remove(nearestNote.sectionId, nearestNote.noteId);
+      return this.getHitResult(lane, hitTimeMs, deltaMs, 3, nearestNote.sectionId, nearestNote.noteId);
     }
 
     else if (deltaMs <= HIT_WINDOW_MS) {
-      this.remove(nearestNote.id);
-      return this.getHitResult(lane, hitTimeMs, deltaMs, 2, nearestNote.id);
+      this.remove(nearestNote.sectionId, nearestNote.noteId);
+      return this.getHitResult(lane, hitTimeMs, deltaMs, 2, nearestNote.sectionId, nearestNote.noteId);
     }
 
     else {
-      this.remove(nearestNote.id);
-      return this.getHitResult(lane, hitTimeMs, deltaMs, 1, nearestNote.id);
+      this.remove(nearestNote.sectionId, nearestNote.noteId);
+      return this.getHitResult(lane, hitTimeMs, deltaMs, 1, nearestNote.sectionId, nearestNote.noteId);
     }
   }
 
@@ -54,13 +54,14 @@ export default class Engine {
     console.log(`${hitTimeMs.toFixed(0)}ms`);
   }
 
-  private getHitResult(lane: number, hitTimeMs: number, deltaMs: number, rating: 0 | 1 | 2 | 3, tileId?: number): HitResult {
+  private getHitResult(lane: number, hitTimeMs: number, deltaMs: number, rating: 0 | 1 | 2 | 3, sectionId?: number, noteId?: number): HitResult {
     const hitResult: HitResult = {
       lane,
       hitTimeMs,
       deltaMs,
       rating,
-      tileId,
+      sectionId,
+      noteId,
     }
 
     return hitResult;
@@ -70,12 +71,12 @@ export default class Engine {
     return this.currentTimeMs + AUDIO_LATENCY_MS;
   }
 
-  private remove(id: number) {
-    this.notes = this.notes.filter(note => note.id !== id);
+  private remove(sectionId: number, noteId: number) {
+    this.beatMap = this.beatMap.filter(note => !(note.sectionId === sectionId && note.noteId === noteId));
   }
 
   cleanMissedNotes() {
-    this.notes = this.notes.filter(note => note.songTimeMs > this.currentTimeMs - HIT_WINDOW_MS);
+    this.beatMap = this.beatMap.filter(note => note.songTimeMs > this.currentTimeMs - HIT_WINDOW_MS);
   }
 }
 

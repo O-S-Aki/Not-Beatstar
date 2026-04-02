@@ -1,6 +1,6 @@
 import { Route, Routes } from 'react-router-dom';
 
-import { GamePage } from './pages';
+import { EditorPage, GamePage } from './pages';
 import { testSong } from './lib/test';
 
 import './App.css'
@@ -12,6 +12,7 @@ const App = ({}) => {
         <div className="main">
           <Routes>
             <Route path='/' element={<GamePage song={testSong} />} />
+            <Route path='/editor' element={<EditorPage song={testSong} />} />
           </Routes>
         </div>
       </div>

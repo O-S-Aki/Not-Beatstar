@@ -37,8 +37,8 @@ const GamePage: React.FC<Props> = ({ song }) => {
     audio.currentTime = 0;
     audio.play();
 
-    const pattern: Note[] = song.pattern ?? [];
-    engineRef.current = new Engine(audio, pattern);
+    const beatMap: Note[] = song.beatMap ?? [];
+    engineRef.current = new Engine(audio, beatMap);
   }
 
   return (
@@ -52,7 +52,7 @@ const GamePage: React.FC<Props> = ({ song }) => {
           </div>
           
           <div className="board-container d-flex flex-column justify-content-end align-items-center">
-            <Board notes={engineRef.current?.notes ?? []} songTimeMs={songTimeMs} feedbackArray={feedbackState.feedbackArray} onLaneTouch={onLaneTouch} />
+            <Board notes={engineRef.current?.beatMap ?? []} songTimeMs={songTimeMs} feedbackArray={feedbackState.feedbackArray} onLaneTouch={onLaneTouch} />
           </div>
         </div>
       </div>
