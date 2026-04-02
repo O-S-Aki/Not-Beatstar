@@ -35,7 +35,7 @@ html {
   position: relative;
   min-height: 100%;
   border: none;
-  background-color: black;
+  background-color: var(--background);
 }
 
 body {

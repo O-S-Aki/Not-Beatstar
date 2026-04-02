@@ -1,5 +1,5 @@
 .app {
-  background-color: black;
+  background-color: var(--background);
 }
 
 .main {

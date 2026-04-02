@@ -1,3 +1,7 @@
+.game-page {
+  background-color: var(--primary);
+}
+
 .board-container {
   flex: 1;
   width: 100%;

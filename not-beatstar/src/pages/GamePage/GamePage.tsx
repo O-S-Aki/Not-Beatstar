@@ -43,7 +43,7 @@ const GamePage: React.FC<Props> = ({ song }) => {
 
   return (
     <>
-      <div className='app-page d-flex flex-column align-items-center'>
+      <div className='app-page game-page d-flex flex-column align-items-center'>
         <div className="game-container d-flex flex-column align-items-center pt-3">
           <audio ref={songRef} src={song.uri} />
 
