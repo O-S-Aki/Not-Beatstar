@@ -1,4 +1,4 @@
-import { Lane } from '../';
+import { Lane } from '..';
 
 import type { Note, HitFeedback } from '../../lib/interfaces';
 

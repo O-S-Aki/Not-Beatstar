@@ -1,0 +1,162 @@
+.beatmap-recorder {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.recorder-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.recorder-title {
+  margin: 0;
+}
+
+.recorder-subtitle {
+  margin: 0;
+  opacity: 0.5;
+  font-size: 0.85rem;
+}
+
+.recorder-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.recorder-section-label {
+  margin: 0;
+  font-size: 0.8rem;
+  opacity: 0.6;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* SECTION PICKER */
+.section-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.section-btn {
+  padding: 0.4rem 0.8rem;
+  border: 1px solid #444;
+  border-radius: 0.4rem;
+  background: transparent;
+  cursor: pointer;
+}
+
+.section-btn--active {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  color: white;
+}
+
+/* MODE PICKER */
+.mode-picker {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.mode-btn {
+  padding: 0.4rem 0.8rem;
+  border: 1px solid #444;
+  border-radius: 0.4rem;
+  background: transparent;
+  cursor: pointer;
+}
+
+.mode-btn--active {
+  color: white;
+}
+
+.mode-btn--normal.mode-btn--active   { background: #e74c3c; border-color: #e74c3c; }
+.mode-btn--double.mode-btn--active   { background: #f39c12; border-color: #f39c12; }
+.mode-btn--checkpoint.mode-btn--active { background: #27ae60; border-color: #27ae60; }
+
+/* RECORD BUTTON */
+.record-btn {
+  width: fit-content;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.record-btn--start { background: #27ae60; color: white; }
+.record-btn--stop  { background: #e74c3c; color: white; }
+
+/* TIMELINE */
+.timeline {
+  position: relative;
+  height: 40px;
+  background: #1b1b1b;
+  border-radius: 0.4rem;
+  overflow: hidden;
+}
+
+.timeline-progress {
+  position: absolute;
+  height: 100%;
+  background: #2c83f5;
+  opacity: 0.25;
+  transition: width 30ms linear;
+}
+
+.timeline-cursor {
+  position: absolute;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  background: white;
+  box-shadow: 0 0 6px white;
+}
+
+.timeline-marker {
+  position: absolute;
+  top: 0;
+  width: 3px;
+  height: 100%;
+}
+
+.marker--normal     { background: #e74c3c; }
+.marker--double     { background: #f39c12; }
+.marker--checkpoint { background: #27ae60; }
+
+/* LEGEND */
+.timeline-legend {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.75rem;
+}
+
+.legend-item { display: flex; align-items: center; gap: 0.3rem; }
+.legend-item::before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+.legend-item--normal::before     { background: #e74c3c; }
+.legend-item--double::before     { background: #f39c12; }
+.legend-item--checkpoint::before { background: #27ae60; }
+
+/* JSON OUTPUT */
+.json-output {
+  background: #0d0d0d;
+  color: #8aff8a;
+  padding: 1rem;
+  border-radius: 0.4rem;
+  overflow-x: auto;
+  max-height: 300px;
+  font-size: 0.8rem;
+  user-select: all;
+}

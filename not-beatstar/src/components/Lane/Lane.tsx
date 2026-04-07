@@ -4,7 +4,7 @@ import { TRAVEL_TIME_MS, THRESHOLD_OFFSET_PERCENT } from '../../lib/constants/Ga
 import { getTilePosition } from '../../lib/game';
 import { getHitDescriptionFromRating } from '../../lib/util/getHitDescriptionFromRating';
 
-import { Tile } from '../';
+import { Tile } from '..';
 import type { Note, HitFeedback } from '../../lib/interfaces';
 
 import './lane.css'
@@ -75,7 +75,7 @@ const Lane: React.FC<Props> = ({ threshold, position, notes, songTimeMs, hitFeed
                 }
 
                 return (
-                  <Tile key={note.id} note={note} style={{ transform: `translateY(${tilePosition}px)` }} />
+                  <Tile key={`${note.sectionId}.${note.noteId}`} note={note} style={{ transform: `translateY(${tilePosition}px)` }} />
                 )
               })
             }
@@ -83,7 +83,7 @@ const Lane: React.FC<Props> = ({ threshold, position, notes, songTimeMs, hitFeed
             <div key={hitFeedback.key} className={`lane-overlay ${laneHitRating ? `animate hit-${laneHitRating}` : ''}`}></div>
 
             {/*
-              <Tile key={-1} note={{id: -1, lane: -1, songTimeMs: 0, isHalf: false, isCheckpoint: true}} style={{ transform: `translateY(${350}px)` }} />
+              <Tile key={-1} note={{sectionId: -1, noteId: -1, lane: -1, songTimeMs: 0, isHalf: false, isCheckpoint: true}} style={{ transform: `translateY(${350}px)` }} />
             */}
 
             </>

@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 
-import { useGameLoop, useInput, useHitFeedback } from '../../hooks/';
+import { useGameLoop, useInput, useHitFeedback } from '../../hooks';
 
 import { Board, ScoreIndicator } from '../../components';
 import { Engine, handleGameLoop, handleInput } from '../../lib/game';

@@ -20,7 +20,7 @@ export default class Engine {
     const potentialNotes: Note[] = this.notes.filter(note => note.lane === lane);
     
     if (potentialNotes.length === 0) {
-      return this.getHitResult(lane, 0, 0, 0);
+      return this.getHitResult(lane, 0, 0, 0, -1, -1);
     }
 
     const nearestNote: Note = potentialNotes.reduce((best, note) =>
@@ -34,33 +34,36 @@ export default class Engine {
     // console.log(`Lane ${lane} | noteTime ${human} | audio ${this.currentTimeMs.toFixed(0)} | Δ${Math.round(deltaMs)}ms`);
 
     if (deltaMs <= PERFECT_WINDOW_MS) {
-      this.remove(nearestNote.id);
-      return this.getHitResult(lane, hitTimeMs, deltaMs, 3, nearestNote.id);
+      this.remove(nearestNote.sectionId, nearestNote.noteId);
+      return this.getHitResult(lane, hitTimeMs, deltaMs, 3, nearestNote.sectionId, nearestNote.noteId);
     }
 
     else if (deltaMs <= HIT_WINDOW_MS) {
-      this.remove(nearestNote.id);
-      return this.getHitResult(lane, hitTimeMs, deltaMs, 2, nearestNote.id);
+      this.remove(nearestNote.sectionId, nearestNote.noteId);
+      return this.getHitResult(lane, hitTimeMs, deltaMs, 2, nearestNote.sectionId, nearestNote.noteId);
     }
 
     else {
-      this.remove(nearestNote.id);
-      return this.getHitResult(lane, hitTimeMs, deltaMs, 1, nearestNote.id);
+      this.remove(nearestNote.sectionId, nearestNote.noteId);
+      return this.getHitResult(lane, hitTimeMs, deltaMs, 1, nearestNote.sectionId, nearestNote.noteId);
     }
   }
 
-  recordTimeStamp(): void {
+  getTimeStamp(): number {
     const hitTimeMs: number = this.getAdjustedTime();
+    
     console.log(`${hitTimeMs.toFixed(0)}ms`);
+    return hitTimeMs;
   }
 
-  private getHitResult(lane: number, hitTimeMs: number, deltaMs: number, rating: 0 | 1 | 2 | 3, tileId?: number): HitResult {
+  private getHitResult(lane: number, hitTimeMs: number, deltaMs: number, rating: 0 | 1 | 2 | 3, sectionId: number, noteId: number): HitResult {
     const hitResult: HitResult = {
       lane,
       hitTimeMs,
       deltaMs,
       rating,
-      tileId,
+      sectionId,
+      noteId,
     }
 
     return hitResult;
@@ -70,8 +73,8 @@ export default class Engine {
     return this.currentTimeMs + AUDIO_LATENCY_MS;
   }
 
-  private remove(id: number) {
-    this.notes = this.notes.filter(note => note.id !== id);
+  private remove(sectionId: number, noteId: number): void {
+    this.notes = this.notes.filter(note => !(note.sectionId === sectionId && note.noteId === noteId));
   }
 
   cleanMissedNotes() {

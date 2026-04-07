@@ -1,4 +1,5 @@
-export { default as Board } from './Board/Board';
-export { default as Lane } from './Lane/Lane';
-export { default as Tile } from './Tile/Tile';
-export { default as ScoreIndicator } from './ScoreIndicator/ScoreIndicator';
+export { default as Board } from './board/Board';
+export { default as Lane } from './lane/Lane';
+export { default as Tile } from './tile/Tile';
+export { default as ScoreIndicator } from './scoreIndicator/ScoreIndicator';
+export { default as BeatmapRecorder } from './beatmapRecorder/BeatmapRecorder';

@@ -1,5 +1,6 @@
 export default interface Note {
-  id: number;
+  sectionId: number;
+  noteId: number;
   lane: number;
   songTimeMs: number;
   isHalf: boolean;

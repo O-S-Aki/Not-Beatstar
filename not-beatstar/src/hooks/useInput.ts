@@ -17,7 +17,7 @@ export default function useInput(onKeyPress: (lane: number) => void) {
       };
 
       if (key in laneMap) {
-        onKeyPress(laneMap[key]);
+        callbackRef.current(laneMap[key]);
       }
     }
 
@@ -26,5 +26,5 @@ export default function useInput(onKeyPress: (lane: number) => void) {
     return () => {
       window.removeEventListener("keydown", handleKeyPress)
     }
-  }, [onKeyPress])
+  }, [])
 }
