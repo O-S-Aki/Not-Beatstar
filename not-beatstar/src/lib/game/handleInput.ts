@@ -13,7 +13,7 @@ export default function handleInput (
   if (!engine) return;
 
   const result: HitResult = engine.hit(lane);
-  const feedback: HitFeedback = { key: feedbackState.feedbackArray[lane].key + 1, lane, rating: result.rating, tileId: result.tileId };
+  const feedback: HitFeedback = { key: feedbackState.feedbackArray[lane].key + 1, lane, rating: result.rating, tileId: result.noteId };
 
   feedbackState.setFeedback(lane, feedback);
 
