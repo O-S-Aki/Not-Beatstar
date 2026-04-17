@@ -1,58 +1,8 @@
-/*
-import React from 'react'
-import { useState, useEffect, useRef } from 'react';
-
-import type { Song, Section, Note, RecorderState } from '../../lib/interfaces';
-import { useBeatmapRecorder } from '../../hooks';
-
-import './beatmapRecorder.css';
-
-interface Props {
-  song: Song
-}
-
-const BeatmapRecorder: React.FC<Props> = ({ song }) => {
-  const audioRef = React.useRef<HTMLAudioElement>(null);
-  const engineRef = React.useRef<any>(null);
-
-  const [activeSection, setActiveSection] = useState<Section | null>(null);
-  const [recordedNotes, setRecordedNotes] = useState<Note[]>([]);
-  const [isRecording, setIsRecording] = useState<boolean>(false);
-  const [noteMode, setNoteMode] = useState<0 | 1 | 2>(0);
-
-  const recorderState: RecorderState = useBeatmapRecorder({
-    engine: engineRef.current,
-    audio: audioRef.current!,
-    sectionId: activeSection?.id ?? 0,
-    startTimeMs: activeSection?.startTimeMs ?? 0,
-    noteMode,
-    onNoteAdded: (note) => setRecordedNotes(prev => [...prev, note])
-  });
-
-  useEffect(() => {
-    setIsRecording(recorderState.isRecording);
-  }, [recorderState.isRecording]);
-
-  useEffect(() => {
-    const audio: HTMLAudioElement | null = audioRef.current;
-    
-    if (!audio || !activeSection || !recorderState.isRecording) return;
-
-
-  }, [recorderState.isRecording, activeSection])
-
-  return (
-    <div className="app-component editor-component">
-
-    </div>
-  )
-}
-
-export default BeatmapRecorder */
-
 import { useState, useRef, useEffect } from 'react';
 
 import { useBeatmapRecorder } from '../../hooks';
+import { SectionSplitter } from '../';
+
 import type { Song, Section, Note } from '../../lib/interfaces';
 
 import './beatmapRecorder.css';
@@ -61,63 +11,106 @@ interface Props {
   song: Song;
 }
 
+function buildFinalBeatmap(
+  sectionNotes: Record<number, Note[]>,
+  sections: Section[]
+): Note[] {
+  return [...sections]
+    .sort((a, b) => a.startTimeMs - b.startTimeMs)
+    .flatMap(s =>
+      (sectionNotes[s.id] ?? []).sort((a, b) => a.songTimeMs - b.songTimeMs)
+    );
+}
+
+function buildSongJson(song: Song, sections: Section[], beatMap: Note[]): string {
+  const out = {
+    id: song.id,
+    title: song.title,
+    artist: song.artist,
+    uri: song.uri,
+    sections,
+    pattern: beatMap,
+  };
+  return JSON.stringify(out, null, 2);
+}
+
 const BeatmapRecorder: React.FC<Props> = ({ song }) => {
   const audioRef = useRef<HTMLAudioElement>(null);
 
+  const [songDurationMs, setSongDurationMs] = useState(0);
+  const [sections, setSections] = useState<Section[]>(song.sections ?? []);
   const [activeSection, setActiveSection] = useState<Section | null>(null);
-  const [allRecordedNotes, setAllRecordedNotes] = useState<Note[]>([]);
-  const [progressPercent, setProgressPercent] = useState<number>(0);
-  const [noteMode, setNoteMode] = useState<0 | 1 | 2>(0);
+  const [sectionNotes, setSectionNotes] = useState<Record<number, Note[]>>({});
+  const [progressPercent, setProgressPercent] = useState(0);
 
-  // update progress bar on a timer while recording
+  // progress for recorder timeline
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio || !activeSection) return;
 
     const id = setInterval(() => {
       const currentMs = audio.currentTime * 1000;
-      const sectionDurationMs = activeSection.endTimeMs - activeSection.startTimeMs;
+      const duration = activeSection.endTimeMs - activeSection.startTimeMs;
       const elapsed = currentMs - activeSection.startTimeMs;
-      const pct = Math.min((elapsed / sectionDurationMs) * 100, 100);
-      setProgressPercent(pct);
+      setProgressPercent(Math.min((elapsed / duration) * 100, 100));
     }, 30);
 
     return () => clearInterval(id);
   }, [activeSection]);
 
-  const { isRecording, recordedNotes, start, stop } = useBeatmapRecorder({
+  const handleNoteAdded = (note: Note) => {
+    setSectionNotes(prev => ({
+      ...prev,
+      [note.sectionId]: [...(prev[note.sectionId] ?? []), note],
+    }));
+  };
+
+  const { isRecording, start, stop } = useBeatmapRecorder({
     audio: audioRef.current!,
     sectionId: activeSection?.id ?? 0,
     startTimeMs: activeSection?.startTimeMs ?? 0,
-    noteMode,
-    onNoteAdded: (note) => {
-      setAllRecordedNotes(prev => [...prev, note]);
-    },
+    noteMode: 0,
+    onNoteAdded: handleNoteAdded,
   });
 
   const handleSectionSelect = (section: Section) => {
-    // stop any current recording before switching
     if (isRecording) stop();
-
     setActiveSection(section);
-    setAllRecordedNotes([]);
     setProgressPercent(0);
-
     const audio = audioRef.current!;
     audio.currentTime = section.startTimeMs / 1000;
   };
 
-  const notesForActiveSection = allRecordedNotes.filter(
-    n => n.sectionId === activeSection?.id
-  );
+  // when sections are redefined, clear orphaned recordings
+  const handleSectionsChange = (updated: Section[]) => {
+    setSections(updated);
+    setActiveSection(null);
+    setSectionNotes({});
+    setProgressPercent(0);
+  };
+
+  const notesForActiveSection = activeSection
+    ? (sectionNotes[activeSection.id] ?? [])
+    : [];
 
   const sectionDurationMs = activeSection
     ? activeSection.endTimeMs - activeSection.startTimeMs
     : 1;
 
+  const finalBeatmap = buildFinalBeatmap(sectionNotes, sections);
+  const songJson = buildSongJson(song, sections, finalBeatmap);
+
   return (
     <div className="beatmap-recorder">
-      <audio ref={audioRef} src={song.uri} />
+
+      {/* single audio element shared across both splitter and recorder */}
+      <audio
+        ref={audioRef}
+        src={song.uri}
+        onLoadedMetadata={() => {
+          setSongDurationMs((audioRef.current?.duration ?? 0) * 1000);
+        }}
+      />
 
       {/* HEADER */}
       <div className="recorder-header">
@@ -125,47 +118,47 @@ const BeatmapRecorder: React.FC<Props> = ({ song }) => {
         <p className="recorder-subtitle">Beatmap Recorder</p>
       </div>
 
-      {/* SECTION PICKER */}
-      <div className="recorder-section">
-        <h4 className="recorder-section-label">Sections</h4>
-        <div className="section-picker">
-          {song.sections.map(section => (
-            <button
-              key={section.id}
-              onClick={() => handleSectionSelect(section)}
-              className={`section-btn ${activeSection?.id === section.id ? 'section-btn--active' : ''}`}
-            >
-              {section.description}
-            </button>
-          ))}
-        </div>
+      {/* SECTION SPLITTER */}
+      <div className="recorder-panel">
+        <SectionSplitter
+          songUri={song.uri}
+          songDurationMs={songDurationMs}
+          sections={sections}
+          onChange={handleSectionsChange}
+        />
       </div>
 
-      {/* CONTROLS — only show when section is selected */}
-      {activeSection && (
-        <>
-          {/* NOTE MODE */}
-          <div className="recorder-section">
-            <h4 className="recorder-section-label">Note Mode</h4>
-            <div className="mode-picker">
-              {([
-                { label: 'Normal', value: 0 },
-                { label: 'Double', value: 1 },
-                { label: 'Checkpoint', value: 2 },
-              ] as const).map(mode => (
+      {/* SECTION PICKER */}
+      {sections.length > 0 && (
+        <div className="recorder-panel">
+          <h4 className="recorder-panel-label">Record a Section</h4>
+          <div className="section-picker">
+            {[...sections]
+              .sort((a, b) => a.startTimeMs - b.startTimeMs)
+              .map(section => (
                 <button
-                  key={mode.value}
-                  onClick={() => setNoteMode(mode.value)}
-                  className={`mode-btn mode-btn--${mode.label.toLowerCase()} ${noteMode === mode.value ? 'mode-btn--active' : ''}`}
+                  key={section.id}
+                  onClick={() => handleSectionSelect(section)}
+                  className={`section-btn ${activeSection?.id === section.id ? 'section-btn--active' : ''}`}
                 >
-                  {mode.label}
+                  {section.description}
+                  {sectionNotes[section.id]?.length
+                    ? ` (${sectionNotes[section.id].length})`
+                    : ''}
                 </button>
               ))}
-            </div>
           </div>
+        </div>
+      )}
 
-          {/* RECORD BUTTON */}
-          <div className="recorder-section">
+      {/* RECORDING */}
+      {activeSection && (
+        <>
+          <div className="recorder-panel">
+            <p className="recorder-key-hint">
+              <kbd>A</kbd> / <kbd>S</kbd> → single note &nbsp;|&nbsp;
+              <kbd>D</kbd> → double note
+            </p>
             <button
               onClick={isRecording ? stop : start}
               className={`record-btn ${isRecording ? 'record-btn--stop' : 'record-btn--start'}`}
@@ -174,62 +167,55 @@ const BeatmapRecorder: React.FC<Props> = ({ song }) => {
             </button>
           </div>
 
-          {/* PROGRESS BAR + NOTE MARKERS */}
-          <div className="recorder-section">
-            <h4 className="recorder-section-label">
+          {/* SECTION TIMELINE */}
+          <div className="recorder-panel">
+            <h4 className="recorder-panel-label">
               {activeSection.description} — {notesForActiveSection.length} notes
             </h4>
 
             <div className="timeline">
-              {/* filled progress */}
-              <div
-                className="timeline-progress"
-                style={{ width: `${progressPercent}%` }}
-              />
+              <div className="timeline-progress" style={{ width: `${progressPercent}%` }} />
+              <div className="timeline-cursor" style={{ left: `${progressPercent}%` }} />
 
-              {/* playback cursor */}
-              <div
-                className="timeline-cursor"
-                style={{ left: `${progressPercent}%` }}
-              />
-
-              {/* note markers */}
               {notesForActiveSection.map(note => {
-                const relativePos =
+                const rel =
                   (note.songTimeMs - activeSection.startTimeMs) / sectionDurationMs;
-
-                const markerClass = note.isCheckpoint
-                  ? 'marker--checkpoint'
-                  : note.isHalf
-                  ? 'marker--double'
-                  : 'marker--normal';
-
                 return (
                   <div
-                    key={note.noteId}
-                    className={`timeline-marker ${markerClass}`}
-                    style={{ left: `${relativePos * 100}%` }}
+                    key={`${note.sectionId}-${note.noteId}`}
+                    className={`timeline-marker ${note.isHalf ? 'marker--double' : 'marker--normal'}`}
+                    style={{ left: `${rel * 100}%` }}
                   />
                 );
               })}
             </div>
 
-            {/* LEGEND */}
             <div className="timeline-legend">
-              <span className="legend-item legend-item--normal">Normal</span>
+              <span className="legend-item legend-item--normal">Single</span>
               <span className="legend-item legend-item--double">Double</span>
-              <span className="legend-item legend-item--checkpoint">Checkpoint</span>
             </div>
           </div>
-
-          {/* JSON OUTPUT */}
-          <div className="recorder-section">
-            <h4 className="recorder-section-label">Output JSON</h4>
-            <pre className="json-output">
-              {JSON.stringify(notesForActiveSection, null, 2)}
-            </pre>
-          </div>
         </>
+      )}
+
+      {/* FULL SONG JSON OUTPUT */}
+      {finalBeatmap.length > 0 && (
+        <div className="recorder-panel">
+          <div className="json-output-header">
+            <h4 className="recorder-panel-label">
+              Song JSON — {finalBeatmap.length} notes total
+            </h4>
+            <button
+              className="copy-btn"
+              onClick={() => navigator.clipboard.writeText(songJson)}
+            >
+              Copy
+            </button>
+          </div>
+          <pre className="json-output">
+            {songJson}
+          </pre>
+        </div>
       )}
     </div>
   );
