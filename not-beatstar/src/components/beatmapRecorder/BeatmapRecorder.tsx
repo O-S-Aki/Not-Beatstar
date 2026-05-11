@@ -81,7 +81,6 @@ const BeatmapRecorder: React.FC<Props> = ({ song }) => {
     audio.currentTime = section.startTimeMs / 1000;
   };
 
-  // when sections are redefined, clear orphaned recordings
   const handleSectionsChange = (updated: Section[]) => {
     setSections(updated);
     setActiveSection(null);
