@@ -19,12 +19,10 @@ const SectionSplitter: React.FC<Props> = ({ songUri, songDurationMs, sections, o
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editingName, setEditingName] = useState('');
 
-  // keep ref in sync for use inside event handlers
   useEffect(() => {
     chopMarkersRef.current = chopMarkers;
   }, [chopMarkers]);
 
-  // progress ticker
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -38,7 +36,6 @@ const SectionSplitter: React.FC<Props> = ({ songUri, songDurationMs, sections, o
     return () => clearInterval(id);
   }, [songDurationMs]);
 
-  // spacebar chop — reads from ref so it's never stale
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.code !== 'Space') return;
@@ -58,7 +55,6 @@ const SectionSplitter: React.FC<Props> = ({ songUri, songDurationMs, sections, o
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
-  // auto stop when song ends
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;

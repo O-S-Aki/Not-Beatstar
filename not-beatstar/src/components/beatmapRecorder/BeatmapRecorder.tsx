@@ -43,22 +43,9 @@ const BeatmapRecorder: React.FC<Props> = ({ song }) => {
   const [sectionNotes, setSectionNotes] = useState<Record<number, Note[]>>({});
   const [progressPercent, setProgressPercent] = useState(0);
 
-  // progress for recorder timeline
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio || !activeSection) return;
-
-    const id = setInterval(() => {
-      const currentMs = audio.currentTime * 1000;
-      const duration = activeSection.endTimeMs - activeSection.startTimeMs;
-      const elapsed = currentMs - activeSection.startTimeMs;
-      setProgressPercent(Math.min((elapsed / duration) * 100, 100));
-    }, 30);
-
-    return () => clearInterval(id);
-  }, [activeSection]);
-
   const handleNoteAdded = (note: Note) => {
+    if (!activeSection) return;
+
     setSectionNotes(prev => ({
       ...prev,
       [note.sectionId]: [...(prev[note.sectionId] ?? []), note],
@@ -69,9 +56,47 @@ const BeatmapRecorder: React.FC<Props> = ({ song }) => {
     audio: audioRef.current!,
     sectionId: activeSection?.id ?? 0,
     startTimeMs: activeSection?.startTimeMs ?? 0,
-    noteMode: 0,
     onNoteAdded: handleNoteAdded,
   });
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio || !activeSection) return;
+
+    const duration = activeSection.endTimeMs - activeSection.startTimeMs;
+
+    const id = setInterval(() => {
+      const currentMs = audio.currentTime * 1000;
+      const elapsed = currentMs - activeSection.startTimeMs;
+
+      setProgressPercent(Math.min(Math.max((elapsed / duration) * 100, 0), 100));
+
+      if (currentMs >= activeSection.endTimeMs) {
+        audio.pause();
+        audio.currentTime = activeSection.endTimeMs / 1000;
+
+        setProgressPercent(100);
+
+        if (isRecording) {
+          stop();
+        }
+      }
+    }, 30);
+
+    (function immediateCheck() {
+      const currentMs = audio.currentTime * 1000;
+      const elapsed = currentMs - activeSection.startTimeMs;
+      setProgressPercent(Math.min(Math.max((elapsed / duration) * 100, 0), 100));
+      if (currentMs >= activeSection.endTimeMs) {
+        audio.pause();
+        audio.currentTime = activeSection.endTimeMs / 1000;
+        setProgressPercent(100);
+        if (isRecording) stop();
+      }
+    })();
+
+    return () => clearInterval(id);
+  }, [activeSection, isRecording, stop]);
 
   const handleSectionSelect = (section: Section) => {
     if (isRecording) stop();
@@ -88,6 +113,20 @@ const BeatmapRecorder: React.FC<Props> = ({ song }) => {
     setProgressPercent(0);
   };
 
+  const handleStartRecording = () => {
+    if (!activeSection || !audioRef.current) return;
+
+    setSectionNotes(prev => ({
+      ...prev,
+      [activeSection.id]: [],
+    }));
+
+    setProgressPercent(0);
+    audioRef.current.currentTime = activeSection.startTimeMs / 1000;
+
+    start();
+  }
+
   const notesForActiveSection = activeSection
     ? (sectionNotes[activeSection.id] ?? [])
     : [];
@@ -102,7 +141,6 @@ const BeatmapRecorder: React.FC<Props> = ({ song }) => {
   return (
     <div className="beatmap-recorder">
 
-      {/* single audio element shared across both splitter and recorder */}
       <audio
         ref={audioRef}
         src={song.uri}
@@ -111,13 +149,11 @@ const BeatmapRecorder: React.FC<Props> = ({ song }) => {
         }}
       />
 
-      {/* HEADER */}
       <div className="recorder-header">
         <h2 className="recorder-title">{song.artist} — {song.title}</h2>
         <p className="recorder-subtitle">Beatmap Recorder</p>
       </div>
 
-      {/* SECTION SPLITTER */}
       <div className="recorder-panel">
         <SectionSplitter
           songUri={song.uri}
@@ -127,7 +163,6 @@ const BeatmapRecorder: React.FC<Props> = ({ song }) => {
         />
       </div>
 
-      {/* SECTION PICKER */}
       {sections.length > 0 && (
         <div className="recorder-panel">
           <h4 className="recorder-panel-label">Record a Section</h4>
@@ -150,23 +185,21 @@ const BeatmapRecorder: React.FC<Props> = ({ song }) => {
         </div>
       )}
 
-      {/* RECORDING */}
       {activeSection && (
         <>
           <div className="recorder-panel">
             <p className="recorder-key-hint">
-              <kbd>A</kbd> / <kbd>S</kbd> → single note &nbsp;|&nbsp;
-              <kbd>D</kbd> → double note
+              <kbd>A</kbd> / <kbd>D</kbd> → half note &nbsp;|&nbsp;
+              <kbd>S</kbd> → default note
             </p>
             <button
-              onClick={isRecording ? stop : start}
+              onClick={isRecording ? stop : handleStartRecording}
               className={`record-btn ${isRecording ? 'record-btn--stop' : 'record-btn--start'}`}
             >
               {isRecording ? '⏹ Stop' : '⏺ Record'}
             </button>
           </div>
 
-          {/* SECTION TIMELINE */}
           <div className="recorder-panel">
             <h4 className="recorder-panel-label">
               {activeSection.description} — {notesForActiveSection.length} notes
@@ -190,14 +223,13 @@ const BeatmapRecorder: React.FC<Props> = ({ song }) => {
             </div>
 
             <div className="timeline-legend">
-              <span className="legend-item legend-item--normal">Single</span>
-              <span className="legend-item legend-item--double">Double</span>
+              <span className="legend-item legend-item--normal">Default</span>
+              <span className="legend-item legend-item--double">Half</span>
             </div>
           </div>
         </>
       )}
 
-      {/* FULL SONG JSON OUTPUT */}
       {finalBeatmap.length > 0 && (
         <div className="recorder-panel">
           <div className="json-output-header">
