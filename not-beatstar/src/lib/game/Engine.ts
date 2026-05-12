@@ -1,6 +1,6 @@
 import { HIT_WINDOW_MS, PERFECT_WINDOW_MS, AUDIO_LATENCY_MS } from '../constants/GameConfig';
 
-import type { HitFeedback, HitResult, Note } from '../interfaces'
+import type { HitResult, Note } from '../interfaces'
 
 export default class Engine {
   private audio: HTMLAudioElement;
