@@ -18,27 +18,41 @@ const GamePage: React.FC<Props> = ({ song }) => {
   const engineRef = useRef<Engine | null>(null);
 
   const [songTimeMs, setSongTimeMs] = useState(0);
+  const [isGameOver, setIsGameOver] = useState<boolean>(false);
+
   const feedbackState: FeedbackState = useHitFeedback();
 
   useGameLoop(() => {
-    handleGameLoop(engineRef, setSongTimeMs);
+    if (isGameOver) return;
+    handleGameLoop(engineRef, feedbackState, setSongTimeMs, stopGame);
   })
 
   useInput((lane) => {
-    handleInput(engineRef, feedbackState, lane, true);
+    if (isGameOver) return;
+    handleInput(engineRef, feedbackState, lane, false, stopGame);
   })
 
   const onLaneTouch = (lane: number) => {
-    handleInput(engineRef, feedbackState, lane, true);
+    if (isGameOver) return;
+    handleInput(engineRef, feedbackState, lane, false, stopGame);
   }
 
   const startGame = () => {
+    setIsGameOver(false);
+
     const audio: HTMLAudioElement = songRef.current!;
     audio.currentTime = 0;
     audio.play();
 
     const pattern: Note[] = song.pattern ?? [];
     engineRef.current = new Engine(audio, pattern);
+  }
+
+  const stopGame = () => {
+    setIsGameOver(true);
+
+    const audio: HTMLAudioElement = songRef.current!;
+    audio.pause();
   }
 
   return (

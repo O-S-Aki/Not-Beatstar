@@ -1,6 +1,6 @@
 import { HIT_WINDOW_MS, PERFECT_WINDOW_MS, AUDIO_LATENCY_MS } from '../constants/GameConfig';
 
-import type { HitResult, Note } from '../interfaces'
+import type { HitFeedback, HitResult, Note } from '../interfaces'
 
 export default class Engine {
   private audio: HTMLAudioElement;
@@ -79,6 +79,22 @@ export default class Engine {
 
   cleanMissedNotes() {
     this.notes = this.notes.filter(note => note.songTimeMs > this.currentTimeMs - HIT_WINDOW_MS);
+  }
+
+  detectMissedNotes(): { missed: boolean, result?: HitResult | null } {
+    const missedNote = this.notes.find(note => {
+      const noteMissed = this.currentTimeMs > note.songTimeMs + HIT_WINDOW_MS;
+      return noteMissed;
+    });
+
+    if (missedNote) {
+      this.notes = this.notes.filter(note => !(note.sectionId === missedNote.sectionId && note.noteId === missedNote.noteId));
+
+      const result = this.getHitResult(missedNote.lane, 0, 0, 0, missedNote.sectionId, missedNote.noteId);
+      return { missed: true, result };
+    }
+
+    return { missed: false };
   }
 }
 

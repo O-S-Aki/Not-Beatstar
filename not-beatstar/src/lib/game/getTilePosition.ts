@@ -3,7 +3,8 @@ export default function getTilePosition (
   songTimeMs: number,
   laneHeightPx: number,
   thresholdOffsetPx: number,
-  travelTimeMs: number
+  travelTimeMs: number,
+  tileHeightPx: number
 ): number {
   /**
    * noteTimeMs           - the time relative to the audio in ms where the note should hit the threshold
@@ -18,6 +19,8 @@ export default function getTilePosition (
   const startY = 0;
   const endY = laneHeightPx - thresholdOffsetPx;
 
-  const y = startY + normalisedDelta * endY;
+  const yTop = startY + normalisedDelta * endY;
+  const y = yTop - tileHeightPx / 2;
+
   return y;
 }

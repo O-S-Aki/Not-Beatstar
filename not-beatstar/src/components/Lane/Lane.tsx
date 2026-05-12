@@ -1,5 +1,5 @@
 import { useRef, useLayoutEffect, useState } from 'react';
-import { TRAVEL_TIME_MS, THRESHOLD_OFFSET_PERCENT } from '../../lib/constants/GameConfig';
+import { TRAVEL_TIME_MS, THRESHOLD_OFFSET_PERCENT, TILE_HEIGHT } from '../../lib/constants/GameConfig';
 
 import { getTilePosition } from '../../lib/game';
 import { getHitDescriptionFromRating } from '../../lib/util/getHitDescriptionFromRating';
@@ -20,7 +20,8 @@ interface Props {
 
 const Lane: React.FC<Props> = ({ threshold, position, notes, songTimeMs, hitFeedback, onLaneTouch }) => {
   const laneRef = useRef<HTMLDivElement>(null);
-  const [laneHeightPx, setLaneHeightPx] = useState(0);
+  const [laneHeightPx, setLaneHeightPx] = useState<number>(0);
+  const [tileHeightPx, setTileHeightPx] = useState<number>(0);
 
   useLayoutEffect(() => {
     const lane = laneRef.current;
@@ -29,7 +30,13 @@ const Lane: React.FC<Props> = ({ threshold, position, notes, songTimeMs, hitFeed
       return;
     }
 
-    const update = () => setLaneHeightPx(lane.clientHeight);
+    const update = () => {
+      const laneHeight = lane.clientHeight;
+
+      setLaneHeightPx(laneHeight);
+      setTileHeightPx(laneHeight * TILE_HEIGHT);
+    }
+
     update();
 
     const timeOut: number = setTimeout(update, 0);
@@ -67,7 +74,8 @@ const Lane: React.FC<Props> = ({ threshold, position, notes, songTimeMs, hitFeed
                   songTimeMs,
                   laneHeightPx,
                   thresholdOffsetPx,
-                  TRAVEL_TIME_MS
+                  TRAVEL_TIME_MS,
+                  note.isHalf ? tileHeightPx / 2 : tileHeightPx
                 );
 
                 if (tilePosition < 0 || tilePosition > laneHeightPx) {
@@ -81,10 +89,6 @@ const Lane: React.FC<Props> = ({ threshold, position, notes, songTimeMs, hitFeed
             }
 
             <div key={hitFeedback.key} className={`lane-overlay ${laneHitRating ? `animate hit-${laneHitRating}` : ''}`}></div>
-
-            {/*
-              <Tile key={-1} note={{sectionId: -1, noteId: -1, lane: -1, songTimeMs: 0, isHalf: false, isCheckpoint: true}} style={{ transform: `translateY(${350}px)` }} />
-            */}
 
             </>
           )

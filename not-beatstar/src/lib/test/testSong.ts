@@ -678,7 +678,7 @@ export const testSong: Song = {
       "lane": 2,
       "songTimeMs": 35095,
       "isHalf": false,
-      "isCheckpoint": false
+      "isCheckpoint": true
     },
     {
       "sectionId": 2,
@@ -686,7 +686,7 @@ export const testSong: Song = {
       "lane": 2,
       "songTimeMs": 37153,
       "isHalf": false,
-      "isCheckpoint": true
+      "isCheckpoint": false
     },
     {
       "sectionId": 2,
