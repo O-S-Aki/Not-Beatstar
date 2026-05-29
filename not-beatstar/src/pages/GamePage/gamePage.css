@@ -6,6 +6,7 @@
   flex: 1;
   width: 100%;
   min-height: 0;
+  position: relative;
 }
 
 .game-container {
@@ -13,4 +14,31 @@
   height: 100%;
   max-width: 400px;
   background-color: var(--primary);
+}
+
+.feedback-text-container {
+  position: absolute;
+  top: 0;
+}
+
+.feedback-text {
+  color: white;
+  font-weight: 900;
+
+  text-shadow:
+    0 0 6px rgba(0, 0, 0, 0.9),
+    0 0 12px rgba(0, 0, 0, 0.8),
+    0 0 24px rgba(0, 0, 0, 0.6);
+}
+
+.feedback-text.perfect {
+  color: var(--perfect-color);
+}
+
+.feedback-text.good {
+  color: var(--good-color);
+}
+
+.feedback-text.miss {
+  color: var(--miss-color);
 }
