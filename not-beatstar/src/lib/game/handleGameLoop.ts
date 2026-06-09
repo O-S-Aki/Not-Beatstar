@@ -3,19 +3,19 @@ import { Engine } from './';
 
 import { getHitFeedbackFromHitResult } from '../util/getHitFeedbackFromHitResult';
 
-import type { FeedbackState, HitFeedback } from '../interfaces';
+import type { FeedbackState, GameState, HitFeedback } from '../interfaces';
 
 export default function handleGameLoop(
   engineRef: React.RefObject<Engine | null>, 
   feedbackState: FeedbackState,
-  setTime: (value: React.SetStateAction<number>) => void,
+  gameState: GameState,
   stopGame: () => void
 ) {
   const engine: Engine | null = engineRef.current;
   if (!engine) return;
 
   engine.update();
-  setTime(engine.currentTimeMs);
+  gameState.setSongTimeMs(engine.currentTimeMs);
 
   const { missed, result } = engine.detectMissedNotes();
 

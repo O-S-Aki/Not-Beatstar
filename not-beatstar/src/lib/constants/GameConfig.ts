@@ -8,3 +8,17 @@ export const TRAVEL_TIME_MS: number = 2000;
 export const THRESHOLD_OFFSET_PERCENT: number = 0.18;
 
 export const TILE_HEIGHT: number = 0.16;
+
+export const PERFECT_SCORE: number = 120;
+export const GOOD_SCORE: number = 70;
+export const MISS_SCORE: number = 0;
+
+export const STREAK_THRESHOLDS: number[][] = [
+  [0, 1],
+  [10, 1.1],
+  [25, 1.2],
+  [50, 1.3],
+  [100, 1.4],
+  [150, 1.5],
+  [200, 2]
+];

@@ -1,13 +1,11 @@
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 
-import { useGameLoop, useInput, useHitFeedback } from '../../hooks';
+import { useGameLoop, useInput, useFeedbackState, useGameState } from '../../hooks';
 
 import { Board, ScoreIndicator } from '../../components';
 import { Engine, handleGameLoop, handleInput } from '../../lib/game';
 
-import { getHitDescriptionFromRating } from '../../lib/util/getHitDescriptionFromRating';
-
-import type { Song, Note, FeedbackState } from '../../lib/interfaces';
+import type { Song, Note, FeedbackState, GameState } from '../../lib/interfaces';
 
 import './gamePage.css';
 
@@ -19,31 +17,27 @@ const GamePage: React.FC<Props> = ({ song }) => {
   const songRef = useRef<HTMLAudioElement>(null);
   const engineRef = useRef<Engine | null>(null);
 
-  const [songTimeMs, setSongTimeMs] = useState(0);  
-  const [isGameOver, setIsGameOver] = useState<boolean>(false);
-
-  const [score, setScore] = useState(0);
-  const [stage, setStage] = useState(1);
-
-  const feedbackState: FeedbackState = useHitFeedback();
+  const feedbackState: FeedbackState = useFeedbackState();
+  const gameState: GameState = useGameState();
 
   useGameLoop(() => {
-    if (isGameOver) return;
-    handleGameLoop(engineRef, feedbackState, setSongTimeMs, stopGame);
+    if (gameState.isGameOver) return;
+    handleGameLoop(engineRef, feedbackState, gameState, stopGame);
   })
 
   useInput((lane) => {
-    if (isGameOver) return;
-    handleInput(engineRef, feedbackState, lane, false, stopGame);
+    if (gameState.isGameOver) return;
+    handleInput(engineRef, feedbackState, gameState, lane, false, stopGame);
   })
 
   const onLaneTouch = (lane: number) => {
-    if (isGameOver) return;
-    handleInput(engineRef, feedbackState, lane, false, stopGame);
+    if (gameState.isGameOver) return;
+    handleInput(engineRef, feedbackState, gameState, lane, false, stopGame);
   }
 
   const startGame = () => {
-    setIsGameOver(false);
+    gameState.reset();
+    gameState.setIsGameOver(false);
 
     const audio: HTMLAudioElement = songRef.current!;
     audio.currentTime = 0;
@@ -54,14 +48,10 @@ const GamePage: React.FC<Props> = ({ song }) => {
   }
 
   const stopGame = () => {
-    setIsGameOver(true);
+    gameState.setIsGameOver(true);
 
     const audio: HTMLAudioElement = songRef.current!;
     audio.pause();
-  }
-
-  const getText = (lane: number): string | null => {
-    return getHitDescriptionFromRating(feedbackState.feedbackArray[lane].rating)?.toUpperCase() ?? null;
   }
 
   return (
@@ -71,15 +61,15 @@ const GamePage: React.FC<Props> = ({ song }) => {
           <audio ref={songRef} src={song.uri} />
 
           <div onClick={startGame}>
-            <ScoreIndicator score={score} stage={stage} />
+            <ScoreIndicator score={gameState.score} stage={gameState.stage} />
           </div>
           
           <div className="board-container d-flex flex-column justify-content-end align-items-center">
             <div className="feedback-text-container w-100 d-flex justify-content-center p-3">
-              <h1 className="feedback-text text-center m-0">{getText(0)}{getText(1)}{getText(2)}</h1>
+              <h1 className="feedback-text text-center m-0">{feedbackState.hitDescription.rating}</h1>
             </div>
 
-            <Board notes={engineRef.current?.notes ?? []} songTimeMs={songTimeMs} feedbackArray={feedbackState.feedbackArray} onLaneTouch={onLaneTouch} />
+            <Board notes={engineRef.current?.notes ?? []} songTimeMs={gameState.songTimeMs} feedbackArray={feedbackState.feedbackArray} onLaneTouch={onLaneTouch} />
           </div>
         </div>
       </div>

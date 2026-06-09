@@ -20,7 +20,7 @@ export default class Engine {
     const potentialNotes: Note[] = this.notes.filter(note => note.lane === lane);
     
     if (potentialNotes.length === 0) {
-      return this.getHitResult(lane, 0, 0, 0, -1, -1);
+      return this.getHitResult(lane, 0, 0, 0, -1, -1, false);
     }
 
     const nearestNote: Note = potentialNotes.reduce((best, note) =>
@@ -35,17 +35,17 @@ export default class Engine {
 
     if (deltaMs <= PERFECT_WINDOW_MS) {
       this.remove(nearestNote.sectionId, nearestNote.noteId);
-      return this.getHitResult(lane, hitTimeMs, deltaMs, 3, nearestNote.sectionId, nearestNote.noteId);
+      return this.getHitResult(lane, hitTimeMs, deltaMs, 3, nearestNote.sectionId, nearestNote.noteId, nearestNote.isCheckpoint);
     }
 
     else if (deltaMs <= HIT_WINDOW_MS) {
       this.remove(nearestNote.sectionId, nearestNote.noteId);
-      return this.getHitResult(lane, hitTimeMs, deltaMs, 2, nearestNote.sectionId, nearestNote.noteId);
+      return this.getHitResult(lane, hitTimeMs, deltaMs, 2, nearestNote.sectionId, nearestNote.noteId, nearestNote.isCheckpoint);
     }
 
     else {
       this.remove(nearestNote.sectionId, nearestNote.noteId);
-      return this.getHitResult(lane, hitTimeMs, deltaMs, 1, nearestNote.sectionId, nearestNote.noteId);
+      return this.getHitResult(lane, hitTimeMs, deltaMs, 1, nearestNote.sectionId, nearestNote.noteId, nearestNote.isCheckpoint);
     }
   }
 
@@ -56,7 +56,7 @@ export default class Engine {
     return hitTimeMs;
   }
 
-  private getHitResult(lane: number, hitTimeMs: number, deltaMs: number, rating: 0 | 1 | 2 | 3, sectionId: number, noteId: number): HitResult {
+  private getHitResult(lane: number, hitTimeMs: number, deltaMs: number, rating: 0 | 1 | 2 | 3, sectionId: number, noteId: number, isCheckpoint: boolean): HitResult {
     const hitResult: HitResult = {
       lane,
       hitTimeMs,
@@ -64,6 +64,7 @@ export default class Engine {
       rating,
       sectionId,
       noteId,
+      isCheckpoint,
     }
 
     return hitResult;
@@ -90,7 +91,7 @@ export default class Engine {
     if (missedNote) {
       this.notes = this.notes.filter(note => !(note.sectionId === missedNote.sectionId && note.noteId === missedNote.noteId));
 
-      const result = this.getHitResult(missedNote.lane, 0, 0, 0, missedNote.sectionId, missedNote.noteId);
+      const result = this.getHitResult(missedNote.lane, 0, 0, 0, missedNote.sectionId, missedNote.noteId, missedNote.isCheckpoint);
       return { missed: true, result };
     }
 

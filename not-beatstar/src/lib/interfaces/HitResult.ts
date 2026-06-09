@@ -5,4 +5,5 @@ export default interface HitResult {
   rating: 0 | 1 | 2 | 3;
   sectionId: number;
   noteId: number;
+  isCheckpoint: boolean;
 }

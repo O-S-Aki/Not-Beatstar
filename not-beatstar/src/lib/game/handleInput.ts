@@ -3,11 +3,12 @@ import { Engine } from './';
 
 import { getHitFeedbackFromHitResult } from '../util/getHitFeedbackFromHitResult';
 
-import type { HitResult, HitFeedback, FeedbackState } from '../interfaces';
+import type { HitResult, HitFeedback, FeedbackState, GameState } from '../interfaces';
 
 export default function handleInput (
   engineRef: React.RefObject<Engine | null>,
   feedbackState: FeedbackState,
+  gameState: GameState,
   lane: number,
   logOutcome: boolean,
   stopGame: () => void
@@ -16,8 +17,9 @@ export default function handleInput (
   if (!engine) return;
 
   const result: HitResult = engine.hit(lane);
-  const feedback: HitFeedback = getHitFeedbackFromHitResult(result, feedbackState);
+  gameState.updateScore(result);
 
+  const feedback: HitFeedback = getHitFeedbackFromHitResult(result, feedbackState);
   feedbackState.setFeedback(lane, feedback);
 
   if (result.rating === 0 || result.rating === 1) {
