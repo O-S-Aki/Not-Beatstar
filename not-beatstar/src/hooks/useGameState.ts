@@ -4,6 +4,7 @@ import { getHitScoreFromRating } from '../lib/util/getHitScoreFromRating';
 import { getStreakMultiplier } from '../lib/util/getStreakMultiplier';
 
 import type { GameState, HitResult } from '../lib/interfaces';
+import { playCheckpointSound } from '../lib/util/sfx';
 
 export default function useGameState(): GameState {
   const [songTimeMs, setSongTimeMs] = useState<number>(0);  
@@ -20,6 +21,7 @@ export default function useGameState(): GameState {
   const updateScore = (hitResult: HitResult) => {
     if (hitResult.isCheckpoint) {
       incrementStage();
+      playCheckpointSound();
     }
 
     if (hitResult.rating >= 3) {

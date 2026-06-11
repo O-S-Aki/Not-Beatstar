@@ -9,36 +9,21 @@
   position: relative;
 }
 
+.horizontal-waveform {
+  position: absolute;
+  z-index: 1;
+  top: auto;
+  left: 0;
+  right: 0;
+  border: 6px solid white;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.6);
+  background-color: white;
+  pointer-events: none;
+}
+
 .game-container {
   width: 100%;
   height: 100%;
   max-width: 400px;
   background-color: var(--primary);
-}
-
-.feedback-text-container {
-  position: absolute;
-  top: 0;
-}
-
-.feedback-text {
-  color: white;
-  font-weight: 900;
-
-  text-shadow:
-    0 0 6px rgba(0, 0, 0, 0.9),
-    0 0 12px rgba(0, 0, 0, 0.8),
-    0 0 24px rgba(0, 0, 0, 0.6);
-}
-
-.feedback-text.perfect {
-  color: var(--perfect-color);
-}
-
-.feedback-text.good {
-  color: var(--good-color);
-}
-
-.feedback-text.miss {
-  color: var(--miss-color);
 }

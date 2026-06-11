@@ -2,7 +2,7 @@ import { useRef } from 'react';
 
 import { useGameLoop, useInput, useFeedbackState, useGameState } from '../../hooks';
 
-import { Board, ScoreIndicator } from '../../components';
+import { Board, FeedbackIndicator, ScoreIndicator } from '../../components';
 import { Engine, handleGameLoop, handleInput } from '../../lib/game';
 
 import type { Song, Note, FeedbackState, GameState } from '../../lib/interfaces';
@@ -60,14 +60,13 @@ const GamePage: React.FC<Props> = ({ song }) => {
         <div className="game-container d-flex flex-column align-items-center pt-3">
           <audio ref={songRef} src={song.uri} />
 
-          <div onClick={startGame}>
+          <div onClick={startGame} className='w-100 d-flex align-items-center justify-content-center position-relative'>
+            <div className="horizontal-waveform"></div>
             <ScoreIndicator score={gameState.score} stage={gameState.stage} />
           </div>
           
           <div className="board-container d-flex flex-column justify-content-end align-items-center">
-            <div className="feedback-text-container w-100 d-flex justify-content-center p-3">
-              <h1 className="feedback-text text-center m-0">{feedbackState.hitDescription.rating} {`${feedbackState.hitDescription.rating?.toUpperCase() == 'PERFECT' && gameState.streak >= 5 ? 'X' + gameState.streak : ''}`}</h1>
-            </div>
+            <FeedbackIndicator feedbackState={feedbackState} gameState={gameState} />
 
             <Board notes={engineRef.current?.notes ?? []} songTimeMs={gameState.songTimeMs} feedbackArray={feedbackState.feedbackArray} onLaneTouch={onLaneTouch} />
           </div>
