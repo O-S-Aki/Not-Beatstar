@@ -32,7 +32,7 @@ export const testSong: Song = {
       "lane": 0,
       "songTimeMs": 5513,
       "isHalf": false,
-      "isCheckpoint": false
+      "isCheckpoint": true
     },
     {
       "sectionId": 0,

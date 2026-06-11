@@ -5,6 +5,8 @@ import { useGameLoop, useInput, useFeedbackState, useGameState } from '../../hoo
 import { Board, FeedbackIndicator, ScoreIndicator } from '../../components';
 import { Engine, handleGameLoop, handleInput } from '../../lib/game';
 
+import { initSfx } from '../../lib/util/sfx';
+
 import type { Song, Note, FeedbackState, GameState } from '../../lib/interfaces';
 
 import './gamePage.css';
@@ -36,6 +38,8 @@ const GamePage: React.FC<Props> = ({ song }) => {
   }
 
   const startGame = () => {
+    initSfx();
+
     gameState.reset();
     gameState.setIsGameOver(false);
 

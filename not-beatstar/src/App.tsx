@@ -1,7 +1,7 @@
 import { Route, Routes } from 'react-router-dom';
 
 import { GamePage, EditorPage } from './pages';
-import { testSong } from './lib/test/testSong2';
+import { testSong } from './lib/test/testSong3';
 
 import './App.css'
 
