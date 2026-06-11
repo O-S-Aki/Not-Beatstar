@@ -8,6 +8,8 @@ export default function useFeedbackState(): FeedbackState {
   const [leftFeedback, setLeftFeedback] = useState<HitFeedback>({key: 0, lane: -1, rating: 0, tileId: null});
   const [centerFeedback, setCenterFeedback] = useState<HitFeedback>({key: 0, lane: -1, rating: 0, tileId: null});
   const [rightFeedback, setRightFeedback] = useState<HitFeedback>({key: 0, lane: -1, rating: 0, tileId: null});
+  
+  const [hitId, setHitId] = useState<number>(0);
   const [hitDescription, setHitDescription] = useState<HitDescription>({tileId: null, rating: null});
 
   const setFeedback = (lane: number, feedback: HitFeedback) => {
@@ -27,6 +29,8 @@ export default function useFeedbackState(): FeedbackState {
       tileId: feedback.tileId || null,
       rating: getHitDescriptionFromRating(feedback.rating)?.toUpperCase() || null
     });
+
+    setHitId(id => id + 1);
   }
 
   const reset = () => {
@@ -36,5 +40,5 @@ export default function useFeedbackState(): FeedbackState {
     setHitDescription({tileId: null, rating: null});
   }
 
-  return { feedbackArray: [leftFeedback, centerFeedback, rightFeedback], hitDescription, setFeedback, reset };
+  return { feedbackArray: [leftFeedback, centerFeedback, rightFeedback], hitId, hitDescription, setFeedback, reset };
 }
