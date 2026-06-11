@@ -66,7 +66,7 @@ const GamePage: React.FC<Props> = ({ song }) => {
           
           <div className="board-container d-flex flex-column justify-content-end align-items-center">
             <div className="feedback-text-container w-100 d-flex justify-content-center p-3">
-              <h1 className="feedback-text text-center m-0">{feedbackState.hitDescription.rating}</h1>
+              <h1 className="feedback-text text-center m-0">{feedbackState.hitDescription.rating} {`${gameState.streak >= 1 ? 'X' + gameState.streak : ''}`}</h1>
             </div>
 
             <Board notes={engineRef.current?.notes ?? []} songTimeMs={gameState.songTimeMs} feedbackArray={feedbackState.feedbackArray} onLaneTouch={onLaneTouch} />
